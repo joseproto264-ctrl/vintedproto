@@ -1,8 +1,8 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
-import { emptyListing, Listing } from '@/lib/types';
-import { loadListings, saveListings } from '@/lib/storage';
-import { reviseListing } from '@/lib/aiRevision';
+import { emptyListing, Listing } from '../lib/types';
+import { loadListings, saveListings } from '../lib/storage';
+import { reviseListing } from '../lib/aiRevision';
 const nav=['Create','Inventory','Connect Vinted'];
 export default function AppShell(){ const [tab,setTab]=useState('Create'); const [listings,setListings]=useState<Listing[]>([]); const [draft,setDraft]=useState<Listing>(emptyListing()); const [status,setStatus]=useState<any>({connected:false}); const [msg,setMsg]=useState('');
 useEffect(()=>{setListings(loadListings()); fetch('/api/vinted/status').then(r=>r.json()).then(setStatus)},[]); const persist=(x:Listing[])=>{setListings(x);saveListings(x)}; const ai=useMemo(()=>reviseListing(draft),[draft]);
