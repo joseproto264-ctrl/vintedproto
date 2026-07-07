@@ -1,0 +1,4 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+:root{color-scheme:light} body{min-height:100vh;background:radial-gradient(circle at top left,#fee2e2,transparent 28rem),radial-gradient(circle at 80% 10%,#dbeafe,transparent 26rem),linear-gradient(135deg,#f8fafc,#eef2ff);color:#111827}.glass{background:rgba(255,255,255,.55);backdrop-filter:blur(22px);border:1px solid rgba(255,255,255,.55);box-shadow:0 20px 80px rgba(15,23,42,.12)}.safe-bottom{padding-bottom:env(safe-area-inset-bottom)}
