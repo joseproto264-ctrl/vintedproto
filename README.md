@@ -22,16 +22,16 @@ Open http://localhost:3000.
 
 ## Real unofficial Vinted connection flow
 
-Vinted does not provide public OAuth for this app. The app therefore uses a backend-only session-cookie flow:
+Vinted does not provide public OAuth for this app. The app therefore uses a backend-only full Cookie-header flow:
 
 1. Click **Continue with Vinted**.
 2. The real Vinted page opens at `https://www.vinted.es/member/signup/select_type?ref_url=%2F`.
 3. Sign in directly on Vinted using Google, Apple, or email.
-4. Return to AutoVinted and paste a Vinted session cookie into the secure field.
-5. The cookie is sent only to backend API routes.
-6. The cookie is never stored in LocalStorage.
-7. The cookie is never hardcoded or exposed through `NEXT_PUBLIC_` variables.
-8. The in-memory server-side session is used to test the connection and load profile data.
+4. Open DevTools, go to Network, refresh Vinted, click a `vinted.es/api` request, and copy the full Request Header named `Cookie`.
+5. Return to AutoVinted and paste the full Cookie header, not a single token value.
+6. The backend sends it exactly as `Cookie: <pasted value>` with browser-like headers (`User-Agent`, `Accept`, `Accept-Language`, `Referer`, and `Origin`).
+7. The cookie is never stored in LocalStorage and is never shown or logged back to the browser.
+8. Only safe debug information is returned: cookie length, cookie-pair count, endpoint called, and status code.
 
 ## Backend routes
 
@@ -48,13 +48,13 @@ Vinted does not provide public OAuth for this app. The app therefore uses a back
 
 ## Selected unofficial integration approach
 
-After reviewing GitHub options, the prior `Androz2091/vinted-api` package was removed because it is focused on public search, has open authentication/cookie issues, and can cause Node runtime compatibility problems such as `fetch is not a function` in some environments. The best cookie-supporting libraries found were primarily Python wrappers, so this Node app now uses a replaceable backend-only session-cookie adapter built on modern Node/Next server `fetch`.
+After reviewing GitHub options, the prior `Androz2091/vinted-api` package was removed because it is focused on public search, has open authentication/cookie issues, and can cause Node runtime compatibility problems such as `fetch is not a function` in some environments. The best cookie-supporting libraries found were primarily Python wrappers, so this Node app now uses a replaceable backend-only full-Cookie-header adapter built on modern Node/Next server `fetch`.
 
 No fake data is generated. If Vinted blocks a request, changes an endpoint, or a feature is unsupported, the app returns the exact backend error and provides an **Open in Vinted** fallback.
 
 ## Supported and guarded features
 
-- Profile: attempts `GET /api/v2/users/current` with the pasted session cookie.
+- Profile: attempts `GET /api/v2/users/current` with the pasted full Cookie header, then falls back to equivalent current-user endpoints used by unofficial clients when the endpoint is missing.
 - Products/listings: attempts user item endpoints after the profile user id is known.
 - Sold listings: attempted when possible; otherwise the backend returns a clear unsupported/error object.
 - Ratings/reviews: attempts user feedback endpoints.
@@ -63,10 +63,10 @@ No fake data is generated. If Vinted blocks a request, changes an endpoint, or a
 
 ## Security notes
 
-- Do not put Vinted cookies, passwords, API keys, or session tokens in frontend code.
+- Do not put Vinted cookies, passwords, API keys, or session tokens in frontend code; paste the full Cookie header only into the runtime form.
 - Do not prefix secrets with `NEXT_PUBLIC_`.
 - `.env.example` documents only server-side settings.
-- The current prototype stores the session cookie in server memory only; use a server-side encrypted secret store before production.
+- The current prototype stores the full Cookie header in server memory only; use a server-side encrypted secret store before production.
 
 ## Replacing the Vinted adapter
 
